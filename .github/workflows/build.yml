@@ -1,0 +1,41 @@
+name: Compilar PTZ Studio (Windows)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restaurar
+        run: dotnet restore PtzStudio.sln
+
+      - name: Testes automatizados da lógica
+        run: dotnet test tests/PtzStudio.Core.Tests/PtzStudio.Core.Tests.csproj -c Release
+
+      - name: Publicar EXE (sem exigir .NET instalado)
+        run: >
+          dotnet publish src/PtzStudio.App/PtzStudio.App.csproj -c Release -r win-x64
+          --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true
+          -o publish
+
+      - name: Instalar Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Gerar instalador
+        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\PtzStudio.iss'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PTZStudio-Windows
+          path: |
+            publish/PTZStudio.exe
+            installer/Output/PTZStudio-Setup.exe
