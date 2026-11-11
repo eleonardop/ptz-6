@@ -70,6 +70,20 @@ public sealed class CameraConfig
     public int ReconnectAttempts { get; set; } = 5;
     /// <summary>Envia consulta periódica para saber se a câmera responde.</summary>
     public bool HealthCheck { get; set; } = true;
+
+    // ---- Vídeo ao vivo (RTSP), mostrado na tela Controle PTZ. Desligado por padrão; arquivos antigos carregam sem mudança. ----
+    /// <summary>Mostra o vídeo da câmera na tela Controle PTZ.</summary>
+    public bool VideoEnabled { get; set; } = false;
+    /// <summary>Endereço RTSP do fluxo principal (maior resolução). Ex.: rtsp://192.168.1.100/1</summary>
+    public string RtspUrl { get; set; } = "";
+    /// <summary>Endereço RTSP do fluxo secundário (menor resolução), usado na prévia quando existir.</summary>
+    public string RtspSubUrl { get; set; } = "";
+    public string RtspUser { get; set; } = "";
+    /// <summary>Guardada em texto simples no arquivo de configurações (como o resto), inclusive em backups e exportações.</summary>
+    public string RtspPassword { get; set; } = "";
+    /// <summary>Verdadeiro: a prévia usa o fluxo secundário (mais leve). Falso: usa o principal.</summary>
+    public bool VideoUsePreviewStream { get; set; } = true;
+
     public CameraConfig Clone() => JsonClone.Clone(this);
 }
 
